@@ -1,0 +1,18 @@
+{
+  "name": "pm-workbench",
+  "version": "1.0.0",
+  "private": true,
+  "description": "项目上线管理工作台（MySQL 版）",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test test/validate.test.js test/weekly.test.js test/wbs.test.js test/crypto.test.js test/docx.test.js test/api.test.js"
+  },
+  "dependencies": {
+    "docx": "^9.15.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^2.5.0",
+    "mysql2": "^3.11.0"
+  }
+}

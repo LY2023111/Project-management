@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mysql:8.4
+    container_name: pm-workbench-db
+    restart: unless-stopped          # Docker 起来后自动运行、崩溃自动重启
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - db-data:/var/lib/mysql       # 数据持久化，重建容器不丢数据
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build: .
+    container_name: pm-workbench-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy   # 等 MySQL 就绪再启动应用
+    environment:
+      APP_PORT: ${APP_PORT:-5200}
+      SESSION_SECRET: ${SESSION_SECRET}
+      AUTH_USERNAME: ${AUTH_USERNAME}
+      AUTH_PASSWORD: ${AUTH_PASSWORD}
+      DB_HOST: db                    # 容器网络里连 db 服务，而不是 localhost
+      DB_PORT: 3306
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    volumes:
+      - ./uploads:/app/uploads       # 合同文件持久化，重建容器不丢
+    ports:
+      - "${APP_PORT:-5200}:${APP_PORT:-5200}"
+
+volumes:
+  db-data:
